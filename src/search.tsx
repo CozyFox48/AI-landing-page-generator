@@ -2,20 +2,31 @@ import React, { useState } from 'react';
 import { Col, Input, Row } from 'antd';
 import CustomCard  from './customCard';
 
-
 const { TextArea } = Input;
 
 interface LandingProps {
-    onGenerate: () => void;
+   onGenerate: (prompt:string) => void;
+   prompt:string;
+   setPrompt:(value:string)=>void;
+  results: { result: string, waiting: boolean }[];
 }
 
-const App: React.FC<LandingProps> = ({ onGenerate }) => {
-    const [loading, setLoading] = useState(false);
+const App: React.FC<LandingProps> = ({ onGenerate,prompt, setPrompt, results }) => {
+    const [loading, setLoading] = useState([false, false, false, false]);
+    const handleDownload = (index:number) => {
+        
+        setLoading([...loading.map((item, i) => (i === index ? true : item))]);
+        const element = document.createElement('a');
+        const file = new Blob([results[index].result], { type: 'text/plain' });
+    
+        element.href = URL.createObjectURL(file);
+        element.download = 'Landing Page.html';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
 
-    const handleDownload = () => {
-        setLoading(true);
         setTimeout(() => {
-            setLoading(false);
+            setLoading([...loading.map((item, i) => (i === index ? false : item))]);
             // Your download functionality here
         }, 2000); // Set a timeout to simulate the download process
     };
@@ -41,13 +52,14 @@ const App: React.FC<LandingProps> = ({ onGenerate }) => {
                                 <TextArea
                                     className="form-control transparent"
                                     placeholder="Your prompt here..."
-                                    autoSize={{ minRows: 4 }}
+                                    autoSize={{ minRows: 2, maxRows: 2 }}
+                                    onChange={(e)=>{setPrompt(e.target.value);}}
                                 />
                             </Col>
                         </Row>
                         <Row justify="center" style={{ marginTop: "5px" }}>
                             <Col span={12}>
-                                <button className="btn btn-warning btn-fill" onClick={onGenerate}>Generate</button>
+                                <button className="btn btn-warning btn-fill" onClick={()=>{onGenerate(prompt);}}>Generate</button>
                             </Col>
                         </Row>
                     </div>
@@ -65,18 +77,18 @@ const App: React.FC<LandingProps> = ({ onGenerate }) => {
             >
                 <Row justify="space-between">
                     <Col span={11}>
-                        <CustomCard loading={loading} onDownload={handleDownload} color="#008080" imageUrl='sample (1).jpg'/>
+                        <CustomCard loading={results[0].waiting||loading[0] } result={results[0].result} index={0} onDownload={handleDownload} color="#008080" imageUrl='sample (1).jpg'/>
                     </Col>
                     <Col span={11}>
-                        <CustomCard loading={loading} onDownload={handleDownload}  color="#FF7F50" imageUrl='sample (2).jpg'/>
+                        <CustomCard loading={results[1].waiting||loading[1]} result={results[1].result} index={1} onDownload={handleDownload}  color="#FF7F50" imageUrl='sample (2).jpg'/>
                     </Col>
                 </Row>
                 <Row justify="space-between">
                     <Col span={11}>
-                        <CustomCard loading={loading} onDownload={handleDownload} color="#9966CC " imageUrl='sample (3).jpg'/>
+                        <CustomCard loading={results[2].waiting||loading[2]} result={results[2].result} index={2} onDownload={handleDownload} color="#9966CC " imageUrl='sample (3).jpg'/>
                     </Col>
                     <Col span={11}>
-                        <CustomCard loading={loading} onDownload={handleDownload}  color="#50C878 " imageUrl='sample (4).jpg'/>
+                        <CustomCard loading={results[3].waiting||loading[3]} result={results[3].result} index={3} onDownload={handleDownload}  color="#50C878 " imageUrl='sample (4).jpg'/>
                     </Col>
                 </Row>
             </div>

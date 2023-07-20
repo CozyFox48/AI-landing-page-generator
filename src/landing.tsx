@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Col, Input, Row } from 'antd';
 import './App.css';
 import './bootstrap.css';
 import './coming-sssoon.css';
 interface LandingProps {
-  onGenerate: () => void;
+  onGenerate: (prompt:string) => void;
+  prompt:string;
+  setPrompt:(value:string)=>void;
 }
 
 const { TextArea } = Input;
 
-const Landing: React.FC<LandingProps> = ({ onGenerate }) => {
+const Landing: React.FC<LandingProps> = ({ onGenerate,prompt, setPrompt }) => {
+
   return (
     <div className="main" style={{ backgroundImage: `url('landing.jpg')` }}>
       <div className="cover black" data-color="black"></div>
@@ -23,13 +26,14 @@ const Landing: React.FC<LandingProps> = ({ onGenerate }) => {
                 <TextArea
                   className="form-control transparent"
                   placeholder="Your prompt here..."
-                  autoSize={{ minRows: 3, maxRows: 5 }}
+                  autoSize={{ minRows: 2, maxRows: 2 }}
+                  onChange={(e)=>{setPrompt(e.target.value);}}
                 />
               </Col>
             </Row>
             <Row justify="center" style={{ marginTop: "5px" }}>
               <Col span={12}>
-                <button className="btn btn-warning btn-fill" onClick={onGenerate}>Generate</button>
+                <button className="btn btn-warning btn-fill" onClick={()=>{onGenerate(prompt);}}>Generate</button>
               </Col>
             </Row>
           </div>
